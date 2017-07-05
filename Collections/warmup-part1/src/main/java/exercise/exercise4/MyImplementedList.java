@@ -1,4 +1,8 @@
 package exercise.exercise4;
+import exercise.exercise4.exceptions.*;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * You should implement from zero a data structure that acts as an ArrayList.
@@ -21,7 +25,7 @@ package exercise.exercise4;
  * @author Cristian.Dumitru
  * @since 7/3/2017.
  */
-public class MyImplementedList<E> {
+public class MyImplementedList<E> implements Iterable<E>{
 
     /**
      * The maximum accepted load property of the data structure.
@@ -58,38 +62,163 @@ public class MyImplementedList<E> {
     //TODO a) implement the empty constructor for the your data structure
     public MyImplementedList() {
         //TODO a) HINT - DEFAULT_CAPACITY, capacityAfterExtending and elementData properties
+        this.capacityAfterExtending = DEFAULT_CAPACITY;
+        this.size = 0;
+        this.elementData = new Object[DEFAULT_CAPACITY];
     }
 
     //TODO b) create the int size() method that returns the size of the data structure
 
+    public int size(){
+        return this.size;
+    }
+
     //TODO c) create the boolean add(E e) method that adds at the end of the data structure an element
+
+    public boolean add(E e){
+        this.elementData[this.size] = e;
+        this.size++;
+        this.extendCapacity();
+        return true;
+    }
+
     //TODO pay attention to the LOAD_FACTOR of the data structure
 
     //TODO d) create the boolean isEmpty() method that checks if the data structure have elements
-
+    public boolean isEmpty(){
+        return (this.size == 0);
+    }
     //TODO e) create the boolean contains(Object o_O) method that checks if the data structure contains the object o_O
-
+    public boolean contains(Object o_O){
+        for (int i = 0; i < this.size; i++)
+            if (this.elementData[i] == o_O) return true;
+        return false;
+    }
     //TODO f) create the int indexOf(Object o_O) method that returns the position in the data structure of the object o_O
     //TODO if exists, otherwise return -1
+    public int indexOf(Object o_O){
+        for (int i = 0; i < this.size; i++)
+            if (this.elementData[i] == o_O) return i;
+        return -1;
+    }
 
     //TODO g) create the int lastIndexOf(Object o_O) method that returns the last position in the data structure of the object o_O
     //TODO if exists, otherwise return -1
+    public int lastIndexOf(Object o_O){
+        for (int i = this.size - 1; i >= 0; i--)
+            if (this.elementData[i] == o_O) return i;
+        return -1;
+    }
 
     //TODO h) create the E get(int index) method that returns the object from the given index
     //TODO pay attention to the size property
 
+    public E get (int index) throws InvalidIndexException{
+        if (index < 0 || index >= this.size) throw new InvalidIndexException("Index is out of bounds!");
+        return (E) this.elementData[index];
+    }
     //TODO i) create the E set(int index, E element) method that updates the value of the element from the given index
     //TODO pay attention to the size property
+    public E set(int index, E element) throws InvalidIndexException{
+        if (index < 0 || index >= this.size) throw new InvalidIndexException("Index is out of bounds!");
+        E prevElement = (E) this.elementData[index];
+        this.elementData[index] = element;
+        return prevElement;
+    }
 
     //TODO j) create the E remove(int index) method that removes the element from the given index
+   // throws InvalidIndexException
+    public E remove (int index) {
+//        if (index < 0 || index >= this.size) throw new InvalidIndexException(" Index is out of bounds!");
+//
+//        E prevElement = (E) this.elementData[index];
+//
+//
+//            if (index != this.size - 1) {
+//                for (int i = index; i < this.size - 1; i++) {
+//                    System.out.println("In the for, making " + elementData[i] + " " + elementData[i + 1]);
+//                    //                E aux = (E) this.elementData[i];
+//                    this.elementData[i] = this.elementData[i + 1];
+//                    //                this.elementData[i + 1] = aux;
+//
+//                }
+//                this.elementData[size - 1] = null;
+//            }
+//            else this.elementData[index] = null;
+//
+//        size--;
+//
+//        return prevElement;
 
+        if (index >= size) return null;
+        E prev = (E) this.elementData[index];
+        for (int i = index + 1; i < size; i++) this.elementData[i - 1] = this.elementData[i];
+
+        this.elementData[size+1] = null;
+        this.size--;
+        return prev;
+
+    }
     //TODO k) extend the current default capacity, if the number of elements in the data structure is > 75% of it
     //TODO you should name it: void extendCapacity(int capacity) - HINT use capacity, DEFAULT_CAPACITY, LOAD_FACTOR and INCREASE_SIZE_FACTOR
 
+    void extendCapacity(){
+        if ((this.size / this.capacityAfterExtending)>LOAD_FACTOR){
+            Object[] newObjectsArray = new Object[INCREASE_SIZE_FACTOR*this.capacityAfterExtending];
+            for (int i = 0; i < this.size; i++) newObjectsArray[i] = elementData[i];
+            elementData = newObjectsArray;
+            this.capacityAfterExtending *= INCREASE_SIZE_FACTOR;
+        }
+    }
     //TODO l) implement the iterator() method in order to use the foreach statement over your data structure - HINT Iterable interface
     //TODO and implement a custom iterator for your custom data structure - methods boolean hasNext(), Object next() and void remove()
 
     //TODO m) implement a method, that uses a Comparator, for your data structure to sort the elements
     //TODO you should name it: void sort(Comparator<? super E> c)
     //TODO create a custom comparator that compares objects by their "what you want" :D - HINT Comparator interface
+
+
+    public Iterator<E> iterator(){
+        return new MyOwnIterator();
+    }
+
+    //My own iterator:
+
+    private class MyOwnIterator implements Iterator<E>{
+        private int cursor;
+
+        public MyOwnIterator(){
+            this.cursor = 0;
+        }
+
+        public boolean hasNext(){
+            return (this.cursor < MyImplementedList.this.size);
+        }
+
+        public E next(){
+//            if (this.hasNext()){
+//                try {
+//                    cursor ++;
+//                    return MyImplementedList.this.get(cursor);
+//                }
+//                catch(Exception e){
+//                    System.out.println("LA NEXT " + e);
+//                }
+//            }
+//            throw new NoSuchElementException();
+            return (E) MyImplementedList.this.elementData[cursor++];
+        }
+
+        public void remove(){
+//            try {
+//                if (MyImplementedList.this.size > 1) cursor++;
+//                MyImplementedList.this.remove(cursor);
+//            }
+//            catch(Exception e){
+//                System.out.println("LA REMOVE " + e);
+//            }
+            MyImplementedList.this.remove(--cursor);
+
+        }
+    }
 }
