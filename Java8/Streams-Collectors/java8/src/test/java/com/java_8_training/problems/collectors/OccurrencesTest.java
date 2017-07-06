@@ -29,10 +29,27 @@ public class OccurrencesTest {
 
     }
 
+//    @Test
+//    public void occurrencesForAListOfSentences() {
+//        List<String> sentences = Arrays.asList("Hello everyone!", "Java 8 is here!");
+//        String word = "cool";
+//        //TODO #C9
+//        Map<String, Long> occ = new HashMap<>();
+//
+//        occ = Arrays.stream(word.split("")).collect(groupingBy(l->l, counting()));
+//
+//
+//        assertEquals(2, (long) occ.get("l"));
+//        assertEquals(4, (long) occ.get(" "));
+//        assertEquals(2, (long) occ.get("!"));
+//        assertEquals(2, (long) occ.get("a"));
+//        assertEquals(6, (long) occ.get("e"));
+//        assertEquals(16, occ.size());
+//    }
+
     @Test
     public void occurrencesForAListOfSentences() {
-        List<String> sentences = Arrays.asList("Hello everyone!", "Java 8 is here!");
-
+        List<String> sentences = Arrays.asList("Hello everyone!", "Java 8 is here");
         //TODO #C9
         Map<String, Long> occ = new HashMap<>();
 

@@ -3,12 +3,16 @@ package com.java_8_training.problems.collectors;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.java_8_training.problems.collectors.Dish.CaloricLevel.DIET;
+import static com.java_8_training.problems.collectors.Dish.CaloricLevel.FAT;
+import static com.java_8_training.problems.collectors.Dish.CaloricLevel.NORMAL;
+
 public class Dish {
 
-    private  String name;
-    private  boolean vegetarian;
-    private  int calories;
-    private  Type type;
+    private String name;
+    private boolean vegetarian;
+    private int calories;
+    private Type type;
 
     public Dish(){};
 
@@ -43,6 +47,11 @@ public class Dish {
         return name;
     }
 
+    public CaloricLevel getCaloriesLevel() {
+        if (0 < this.getCalories() && this.getCalories() <= 400) return DIET;
+        else if (400 < this.getCalories() && this.getCalories() <= 700) return NORMAL;
+        else return FAT;
+    }
     public static final List<Dish> menu =
             Arrays.asList( new Dish("pork", false, 800, Dish.Type.MEAT),
                     new Dish("beef", false, 700, Dish.Type.MEAT),
