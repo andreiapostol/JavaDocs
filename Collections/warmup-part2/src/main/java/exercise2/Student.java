@@ -32,39 +32,49 @@ public class Student {
         return averageGrade;
     }
 
-    // TODO Exercise 2 a) Override the toString() method
+    //  Exercise 2 a) Override the toString() method
     @Override
     public String toString() {
-        return "";
+        String correctView = new String();
+        correctView = "{ID: " + this.id + ", First name: " + this.firstName +
+                ", Last name: " + this.lastName + ", Average grade: " + this.getAverageGrade() + "}";
+        return correctView;
     }
 
-    // TODO Exercise 2 c) Override the equals() method
+    //  Exercise 2 c) Override the equals() method
     @Override
     public boolean equals(Object o) {
-        // TODO Exercise 2 c1) Check if the current instance is the same instance as the one from Object o
+        //  Exercise 2 c1) Check if the current instance is the same instance as the one from Object o
+        if (this == o) return true;
+        if (o == null) return false;
 
-        // TODO Exercise 2 c2) Check if Object o is null
+        if (this.getClass() != o.getClass()) return false;
+        //  Exercise 2 c2) Check if Object o is null
 
-        // TODO Exercise 2 c3) Check if Object o class type is the same as the current instance's type
+        //  Exercise 2 c3) Check if Object o class type is the same as the current instance's type
+        //  Exercise 2 c4) Now you know for sure that the Object o is of type Student so you
+        //  need to cast it to a Student type object
+        Student toCompare = (Student) o;
+        //  Exercise 2 c5) Check if all the fields from Student class are equal to the ones from
+        //  Exercise 2 c5) Object o (id, lastName, firstName, averageGrade)
 
-        // TODO Exercise 2 c4) Now you know for sure that the Object o is of type Student so you
-        // TODO need to cast it to a Student type object
-
-        // TODO Exercise 2 c5) Check if all the fields from Student class are equal to the ones from
-        // TODO Exercise 2 c5) Object o (id, lastName, firstName, averageGrade)
-
-        return false;
-
-        // TODO Exercise 2 d) After you finished implementing equals method go to TODO Exercise 2 e) from Exercise2 class
+        return (id.equals(toCompare.getId()) && firstName.equals(toCompare.getFirstName()) &&
+            lastName.equals(toCompare.getLastName()) && averageGrade.equals(toCompare.getAverageGrade()));
+        //  Exercise 2 d) After you finished implementing equals method go to TODO Exercise 2 e) from Exercise2 class
     }
 
-    // TODO Exercise 2 g) Override the hashCode() method
-    // TODO Exercise 2 g) Hint: Don't forget to include in the hashCode result all the fields from
-    // TODO Exercise 2 g) the Student class
+    //  Exercise 2 g) Override the hashCode() method
+    //  Exercise 2 g) Hint: Don't forget to include in the hashCode result all the fields from
+    //  Exercise 2 g) the Student class
     @Override
     public int hashCode() {
-        return 0;
-        // TODO Exercise 2 h) After you finished implementing hashCode go to TODO Exercise 2 i) from Exercise2 class
+        int result = 0;
+        result += 19 * id;
+        result += 19 * result + firstName.hashCode();
+        result += 19 * result + lastName.hashCode();
+        result += 19 * result + averageGrade.hashCode();
+        return result;
+        //  Exercise 2 h) After you finished implementing hashCode go to TODO Exercise 2 i) from Exercise2 class
     }
 
 }

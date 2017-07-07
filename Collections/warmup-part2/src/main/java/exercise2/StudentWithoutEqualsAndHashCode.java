@@ -19,6 +19,14 @@ public class StudentWithoutEqualsAndHashCode {
         this.student = student;
     }
 
+    @Override
+    public String toString() {
+        String correctView = new String();
+        correctView = "{Without eq. & hash: ID: " + this.id + ", First name: " + this.firstName +
+                ", Last name: " + this.lastName + ", Average grade: " + this.getAverageGrade() + "}";
+        return correctView;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -31,8 +31,9 @@ public class Exercise2 {
 
         System.out.println("The list of students is: " + studentList);
 
-        // TODO Exercise 2 a) In order to print the properties (fields) of Student class in a human readable way you should override
-        // TODO the toString() method from Student class -> TODO Exercise 2 a)
+        //  Exercise 2 a) In order to print the properties
+        //  (fields) of Student class in a human readable way you should override
+        //  the toString() method from Student class ->  Exercise 2 a)
 
         // A Set with elements of type Student without the methods equals() and hashCode() implemented
         Set<StudentWithoutEqualsAndHashCode> studentSetWithoutEqualsAndHashCode =
@@ -51,9 +52,9 @@ public class Exercise2 {
         System.out.println("The set of students is: " + studentSetWithoutEqualsAndHashCode);
         System.out.println("The map of students is: " + studentMapWithoutEqualsAndHashCode);
 
-        // TODO Exercise 2 b) After you finished the Exercise 2 a) run the test file and look at the content ofSS
-        // TODO the collections studentSetWithoutEqualsAndHashCode and studentMapWithoutEqualsAndHashCode. What do you notice?
-        // TODO Go to Exercise 2 c) from Student class and implement equals() method
+        //  Exercise 2 b) After you finished the Exercise 2 a) run the test file and look at the content ofSS
+        //  the collections studentSetWithoutEqualsAndHashCode and studentMapWithoutEqualsAndHashCode. What do you notice?
+        //  Go to Exercise 2 c) from Student class and implement equals() method
 
         // A Set with elements of type Student without the method hashCode() implemented
         Set<StudentWithoutHashCode> studentSetWithoutHashCode = new HashSet<StudentWithoutHashCode>();
@@ -67,13 +68,13 @@ public class Exercise2 {
             studentMapWithoutHashCode.put(student, cnps.get(student.getId()));
         }
 
-        // TODO Exercise 2 e) After you finished the Exercise 2 c) run the test file and look at the content of
-        // TODO the collections studentSetWithoutHashCode and studentMapWithoutHashCode. What do you notice?
+        //  Exercise 2 e) After you finished the Exercise 2 c) run the test file and look at the content of
+        //  the collections studentSetWithoutHashCode and studentMapWithoutHashCode. What do you notice?
 
         System.out.println("The set of students with equals implemented is: " + studentSetWithoutHashCode);
         System.out.println("The map of students with equals implemented is: " + studentMapWithoutHashCode);
 
-        // TODO Exercise 2 f) Go to TODO Exercise 2 g) from Student class and implement hashCode() method
+        //  Exercise 2 f) Go to Exercise 2 g) from Student class and implement hashCode() method
 
         // A Set with elements of type Student
         Set<Student> studentSet = new HashSet<Student>();
@@ -87,8 +88,8 @@ public class Exercise2 {
             studentMap.put(student, cnps.get(student.getId()));
         }
 
-        // TODO Exercise 2 i) After you finished the Exercise 2 g) run the test file and look at the content of
-        // TODO the collections studentSet and studentMap. What do you notice this time?
+        //  Exercise 2 i) After you finished the Exercise 2 g) run the test file and look at the content of
+        //  the collections studentSet and studentMap. What do you notice this time?
 
         System.out.println("The set of students with equals and hashCode implemented is: " + studentSet);
         System.out.println("The map of students with equals and hashCode implemented is: " + studentMap);

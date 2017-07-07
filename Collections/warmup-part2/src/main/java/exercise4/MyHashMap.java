@@ -1,5 +1,7 @@
 package exercise4;
 
+import sun.awt.image.ImageWatched;
+
 import java.util.*;
 
 /**
@@ -17,62 +19,109 @@ public class MyHashMap {
 
     private final int BUCKET_ARRAY_SIZE = 16;
 
+    private int size;
+
     public MyHashMap() {
 
         // TODO Initialize buckets list
+        buckets = new ArrayList<LinkedList<MyEntry>>(BUCKET_ARRAY_SIZE);
+        for (int i = 0; i < BUCKET_ARRAY_SIZE; i++) buckets.add(i, new LinkedList<MyEntry>());
+        size = 0;
     }
 
     public String get(String key) {
         // TODO
+        if (key == null) return null;
+        LinkedList<MyEntry> theBucket = buckets.get(Math.abs(key.hashCode()%BUCKET_ARRAY_SIZE));
+        for (MyEntry entry : theBucket)
+            if (entry.getKey().equals(key)) return entry.getValue();
         return null;
     }
 
     public void put(String key, String value) {
         // TODO
+        if(key != null) {
+            int location = Math.abs(key.hashCode() % BUCKET_ARRAY_SIZE);
+            LinkedList<MyEntry> theList = buckets.get(location);
+            for (int i = 0; i < theList.size(); i++)
+                if (value.equals(theList.get(i).getValue())) return;
+            theList.add(new MyEntry(key, value));
+            size++;
+        }
+        else {
+            LinkedList<MyEntry> theList = buckets.get(0);
+            for (int i = 0; i < theList.size(); i++)
+                if (theList.get(i).getKey() == null) return;
+            theList.add(new MyEntry(null, value));
+            size++;
+        }
     }
 
     public Set<String> keySet() {
-        // TODO
-        return null;
+        Set<String> theKeySet = new HashSet<String>();
+        for(int i = 0; i < BUCKET_ARRAY_SIZE; i++)
+            for (MyEntry j : buckets.get(i)) theKeySet.add(j.getKey());
+        return theKeySet;
     }
 
     public Collection<String> values() {
         // TODO
-        return null;
+        Set<String> theValueSet = new HashSet<String>();
+        for(int i = 0; i < BUCKET_ARRAY_SIZE; i++)
+            for (MyEntry j : buckets.get(i)) theValueSet.add(j.getValue());
+        return theValueSet;
     }
 
     public String remove(String key) {
         // TODO Returns the value associated with the key removed from the map or null if the key wasn't found
+        LinkedList<MyEntry> theBucket = buckets.get(Math.abs(key.hashCode()%BUCKET_ARRAY_SIZE));
+        for (MyEntry entry : theBucket)
+            if (entry.getKey().equals(key)){
+                String toReturn = entry.getValue();
+                theBucket.remove(entry);
+                size--;
+                return toReturn;
+            }
         return null;
     }
 
     public boolean containsKey(String key) {
-        // TODO
+        LinkedList<MyEntry> theBucket = buckets.get(Math.abs(key.hashCode()%BUCKET_ARRAY_SIZE));
+        for (MyEntry entry : theBucket)
+            if (entry.getKey().equals(key)) return true;
         return false;
     }
 
     public boolean containsValue(String value) {
-        // TODO
+        for (LinkedList<MyEntry> theBucket : buckets)
+            for (MyEntry entry : theBucket)
+                if (entry.getValue().equals(value)) return true;
         return false;
     }
 
     public int size() {
-        // TODO Return the number of the Entry objects stored in all the buckets
-        return 0;
+        // Return the number of the Entry objects stored in all the buckets
+        return size;
     }
 
     public void clear() {
-        // TODO Remove all the Entry objects from the bucket list
+        //  Remove all the Entry objects from the bucket list
+        for (String key : this.keySet()) remove(key);
     }
 
     public Set<MyEntry> entrySet() {
         // TODO Return a Set containing all the Entry objects
-        return null;
+        Set<MyEntry> theReturnedSet = new HashSet<MyEntry>();
+        Set<String> theKeySet = this.keySet();
+
+        if (theKeySet.size() == 0) return null;
+
+        for(String key : theKeySet) theReturnedSet.add(new MyEntry(key, this.get(key)));
+        return theReturnedSet;
     }
 
     public boolean isEmpty() {
-        // TODO
-        return false;
+        return size == 0;
     }
 
     public static class MyEntry {
