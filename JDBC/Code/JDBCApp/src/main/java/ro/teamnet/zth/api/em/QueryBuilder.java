@@ -119,15 +119,16 @@ public class QueryBuilder {
         StringBuilder sqlValues = new StringBuilder(" values (");
         boolean first = true;
         for (ColumnInfo columnInfo : queryColumns) {
-
-            if (!first) {
-                sql.append(",");
-                sqlValues.append(",");
-            } else {
-                first = false;
+            if(columnInfo.getValue() != null) {
+                if (!first) {
+                    sql.append(",");
+                    sqlValues.append(",");
+                } else {
+                    first = false;
+                }
+                sql.append(columnInfo.getDbColumnName());
+                sqlValues.append(getValueForQuery(columnInfo.getValue()));
             }
-            sql.append(columnInfo.getDbColumnName());
-            sqlValues.append(getValueForQuery(columnInfo.getValue()));
         }
 
         sql.append(") ");

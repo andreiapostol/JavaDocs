@@ -4,6 +4,7 @@ import ro.teamnet.zth.api.annotations.Column;
 import ro.teamnet.zth.api.database.DBManager;
 
 
+import javax.management.Query;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Andrei.Apostol on 7/13/2017.
@@ -91,7 +93,7 @@ public class EntityManagerImpl implements EntityManager {
 
         for (ColumnInfo column : columns){
             if(column.isId()) {
-                id = getNextIdVal(tableName, column.getColumnName());
+                id = getNextIdVal(tableName, column.getDbColumnName());
                 column.setValue(id);
             }
             else{
@@ -105,6 +107,7 @@ public class EntityManagerImpl implements EntityManager {
         myQueryBuilder.setTableName(tableName);
         myQueryBuilder.addQueryColumns(columns);
         myQueryBuilder.setQueryType(QueryType.INSERT);
+        //myQueryBuilder.addCondition(new Condition());
 
         String queryToCreate = myQueryBuilder.createQuery();
 
@@ -138,20 +141,167 @@ public class EntityManagerImpl implements EntityManager {
             ArrayList<T> myListToReturn = new ArrayList<>();
 
             while (myResultSet.next()){
+                T objectToInsert = entityClass.newInstance();
                 for (ColumnInfo column : columns) {
-                    T objectToInsert = entityClass.newInstance();
+
                     Field fieldToSet = objectToInsert.getClass().getDeclaredField(column.getColumnName());
                     fieldToSet.setAccessible(true);
                     fieldToSet.set(objectToInsert, EntityUtils.castFromSqlType(myResultSet.getObject(column.getDbColumnName()), fieldToSet.getType()));
-                    myListToReturn.add(objectToInsert);
                 }
+                myListToReturn.add(objectToInsert);
+
             }
-            myConnection.close();
+            //myConnection.close();
             return myListToReturn;
         }
         catch (SQLException e) {
             System.out.println("Eroare 4 + " + e);
         }
+
+        return null;
+    }
+
+    @Override
+    public <T> T update(T entity) throws SQLException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        Connection myConnection = DBManager.getConnection();
+
+        String tableName = EntityUtils.getTableName(entity.getClass());
+        List<ColumnInfo> columns = EntityUtils.getColumns(entity.getClass());
+
+        Object id = null;
+        String columnName = new String();
+        for (ColumnInfo column : columns){
+            if(column.isId()){
+                Field field = entity.getClass().getDeclaredField(column.getColumnName());
+                field.setAccessible(true);
+                column.setValue(field.get(entity));
+                id = column.getValue();
+                columnName = column.getDbColumnName();
+            }
+            else {
+                Field field = entity.getClass().getDeclaredField(column.getColumnName());
+                field.setAccessible(true);
+                column.setValue(field.get(entity));
+            }
+        }
+
+        Condition myCondition = new Condition();
+        myCondition.setValue(id);
+        myCondition.setColumnName(columnName);
+
+        QueryBuilder myQueryBuilder = new QueryBuilder();
+        myQueryBuilder.setTableName(tableName);
+        myQueryBuilder.addQueryColumns(columns);
+        myQueryBuilder.setQueryType(QueryType.UPDATE);
+        myQueryBuilder.addCondition(myCondition);
+
+        String queryToCreate = myQueryBuilder.createQuery();
+
+        try(Statement stmt = myConnection.createStatement()){
+            stmt.executeQuery(queryToCreate);
+            System.out.println(columnName);
+            return (T) findById(entity.getClass(), (Long) id);
+        }
+        catch (Exception e){
+            System.out.println("LA UPDATE " + e);
+        }
+        return null;
+    }
+
+    @Override
+    public void delete(Object entity) throws SQLException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        Connection myConnection = DBManager.getConnection();
+
+        String tableName = EntityUtils.getTableName(entity.getClass());
+        List<ColumnInfo> columns = EntityUtils.getColumns(entity.getClass());
+
+        Object id = null;
+        String columnName = new String();
+        for (ColumnInfo column : columns){
+            if(column.isId()){
+                Field field = entity.getClass().getDeclaredField(column.getColumnName());
+                field.setAccessible(true);
+                column.setValue(field.get(entity));
+                columnName = column.getDbColumnName();
+                id = column.getValue();
+            }
+        }
+
+        Condition myCondition = new Condition();
+        myCondition.setValue(id);
+        myCondition.setColumnName(columnName);
+
+        QueryBuilder myQueryBuilder = new QueryBuilder();
+        myQueryBuilder.setTableName(tableName);
+        myQueryBuilder.addQueryColumns(columns);
+        myQueryBuilder.setQueryType(QueryType.DELETE);
+        myQueryBuilder.addCondition(myCondition);
+
+        String queryToDelete = myQueryBuilder.createQuery();
+
+        try(Statement stmt = myConnection.createStatement()){
+            stmt.executeQuery(queryToDelete);
+            System.out.println(columnName);
+
+        }
+        catch (Exception e){
+            System.out.println("LA DELETE " + e);
+        }
+    }
+
+    @Override
+    public <T> List<T> findByParams(Class<T> entityClass, Map<String, Object> params) throws SQLException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        Connection myConnection = DBManager.getConnection();
+
+        String tableName = EntityUtils.getTableName(entityClass);
+        List<ColumnInfo> columns = EntityUtils.getColumns(entityClass);
+
+
+        QueryBuilder myQueryBuilder = new QueryBuilder();
+
+        for (ColumnInfo column : columns){
+            Field field = entityClass.getDeclaredField(column.getColumnName());
+            field.setAccessible(true);
+            if (params.containsKey(column.getDbColumnName())) {
+                column.setValue(params.get(column.getDbColumnName()));
+
+                Condition myCondition = new Condition();
+                myCondition.setColumnName(column.getDbColumnName());
+                myCondition.setValue(column.getValue());
+                myQueryBuilder.addCondition(myCondition);
+            }
+        }
+
+        myQueryBuilder.setTableName(tableName);
+        myQueryBuilder.addQueryColumns(columns);
+        myQueryBuilder.setQueryType(QueryType.SELECT);
+
+        String mySelectQuery = myQueryBuilder.createQuery();
+
+        try(Statement stmt = myConnection.createStatement()){
+            ResultSet myResultSet = stmt.executeQuery(mySelectQuery);
+            List<T> myFilteredResults = new ArrayList<>();
+
+            while(myResultSet.next()){
+                T objectToAddToResults = entityClass.newInstance();
+                for (ColumnInfo column : columns) {
+
+                    Field fieldToSet = objectToAddToResults.getClass().getDeclaredField(column.getColumnName());
+                    fieldToSet.setAccessible(true);
+                    fieldToSet.set(objectToAddToResults,
+                            EntityUtils.castFromSqlType(myResultSet.getObject(column.getDbColumnName()),
+                                    fieldToSet.getType()));
+                }
+                myFilteredResults.add(objectToAddToResults);
+            }
+            return myFilteredResults;
+
+        }
+        catch (Exception e){
+            System.out.println("LA DELETE " + e);
+        }
+
+
 
         return null;
     }
